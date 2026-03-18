@@ -1,0 +1,225 @@
+<?php
+session_start();
+
+// Receptionist-only page guard
+if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'receptionist') {
+    header('Location: login.php');
+    exit();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receptionist Dashboard — Dental Clinic</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f9;
+      min-height: 100vh;
+    }
+
+    .page-content {
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+
+    /* ── Welcome banner ── */
+    .welcome-banner {
+      background: linear-gradient(135deg, #4a1a6b 0%, #8e44ad 100%);
+      color: white;
+      border-radius: 14px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .welcome-banner h1 {
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .welcome-banner p {
+      font-size: 0.88rem;
+      opacity: 0.78;
+    }
+
+    .welcome-banner .icon {
+      font-size: 3rem;
+      opacity: 0.6;
+    }
+
+    /* ── Quick stats ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 22px 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      border-left: 4px solid #8e44ad;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-card .stat-label {
+      font-size: 0.78rem;
+      color: #888;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .stat-card .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #0d2340;
+      line-height: 1;
+    }
+
+    .stat-card .stat-sub {
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+
+    /* ── Menu cards ── */
+    .section-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #0d2340;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .menu-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 22px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      border: 2px solid transparent;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .menu-card:hover {
+      border-color: #8e44ad;
+      box-shadow: 0 6px 20px rgba(142,68,173,0.15);
+      transform: translateY(-2px);
+    }
+
+    .menu-card .card-icon { font-size: 2rem; }
+
+    .menu-card .card-title {
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #0d2340;
+    }
+
+    .menu-card .card-desc {
+      font-size: 0.8rem;
+      color: #888;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<?php include './views/header.php'; ?>
+
+<div class="page-content">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div>
+      <h1>Welcome, <?= htmlspecialchars($_SESSION['user_name']) ?>!</h1>
+      <p>Manage today's patients, appointments, and billing from here.</p>
+    </div>
+    <div class="icon">🗂</div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Today's Appointments</div>
+      <div class="stat-value">—</div>
+      <div class="stat-sub"><?= date('F j, Y') ?></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Patients</div>
+      <div class="stat-value">—</div>
+      <div class="stat-sub">All registered patients</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending Billing</div>
+      <div class="stat-value">—</div>
+      <div class="stat-sub">Unpaid invoices</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">New Patients</div>
+      <div class="stat-value">—</div>
+      <div class="stat-sub">Registered this week</div>
+    </div>
+  </div>
+
+  <!-- Menu -->
+  <div class="section-title">QUICK NAVIGATION</div>
+  <div class="menu-grid">
+    <a class="menu-card" href="add_patient.php">
+      <div class="card-icon">🧑‍⚕️</div>
+      <div class="card-title">Register New Patient</div>
+      <div class="card-desc">Add a new patient with personal and medical details.</div>
+    </a>
+    <a class="menu-card" href="add_appointment.php">
+      <div class="card-icon">📅</div>
+      <div class="card-title">Book Appointment</div>
+      <div class="card-desc">Schedule a new appointment for a patient with a doctor.</div>
+    </a>
+    <a class="menu-card" href="appointments.php">
+      <div class="card-icon">📋</div>
+      <div class="card-title">Today's Schedule</div>
+      <div class="card-desc">View all appointments scheduled for today.</div>
+    </a>
+    <a class="menu-card" href="billing.php">
+      <div class="card-icon">💳</div>
+      <div class="card-title">Billing</div>
+      <div class="card-desc">Create invoices, add services, and record payments.</div>
+    </a>
+    <a class="menu-card" href="add_patient.php">
+      <div class="card-icon">🔍</div>
+      <div class="card-title">Patient Search</div>
+      <div class="card-desc">Look up any patient by name or contact number.</div>
+    </a>
+    <a class="menu-card" href="settings.php">
+      <div class="card-icon">⚙️</div>
+      <div class="card-title">Settings</div>
+      <div class="card-desc">Update your account and personal information.</div>
+    </a>
+  </div>
+
+</div><!-- /page-content -->
+
+</body>
+</html>
